@@ -1,14 +1,38 @@
 <template>
   <div class="components-container">
     <div class="editor-container" id="editor"></div>
-    <ElButton
-        class="export-pdf-button"
-        type="primary"
-        icon="Download"
-        @click="exportPDF"
-    >
-      Export PDF
-    </ElButton>
+    <el-row>
+      <el-upload
+          class="import-button"
+          action="https://jsonplaceholder.typicode.com/posts/"
+          accept=".md, .txt"
+          :on-success="importMD"
+          multiple
+          :limit="1">
+        <el-button
+            type="primary"
+            plain
+            icon="Upload">
+          Import
+        </el-button>
+      </el-upload>
+      <el-button
+          class="export-button"
+          type="primary"
+          plain
+          icon="Download"
+          @click="exportMD">
+        Export
+      </el-button>
+      <el-button
+          class="render-pdf-button"
+          type="primary"
+          plain
+          icon="MagicStick"
+          @click="renderPDF">
+        Render as PDF
+      </el-button>
+    </el-row>
   </div>
 </template>
 
@@ -34,32 +58,31 @@ export default {
   data() {
     return {
       editor: null,
-      content1: content,
+      content: content,
       html: '',
     };
   },
   mounted() {
-    this.editor = initializeEditor('editor', this.content1);
+    this.editor = initializeEditor('editor', this.content);
   },
   methods: {
-    async exportPDF() {
+    async importMD(res) {},
+    async exportMD() {},
+    async renderPDF() {
       let markdownHTML = '';
 
-      // Check if the editor is in WYSIWYG mode
       if (this.editor.isWysiwygMode()) {
-        // Safely retrieve the HTML content in WYSIWYG mode
         markdownHTML = this.editor.getHTML();
       } else if (this.editor.isMarkdownMode()) {
-        // Convert Markdown content to HTML using marked.js
         const markdownContent = this.editor.getMarkdown();
-        markdownHTML = marked(markdownContent); // Convert Markdown to HTML
+        markdownHTML = marked(markdownContent);
       }
 
-      // Create an off-screen element to render the HTML content
+      // create an off-screen element to render the HTML content
       const tempElement = document.createElement('div');
       tempElement.innerHTML = markdownHTML;
 
-      // Apply CSS to set text size to 12px and ensure margins similar to Google Docs
+      // apply CSS to set text size to 12px and ensure margins similar to Google Docs
       const style = document.createElement('style');
       style.innerHTML = `
         body, div, p, ul, li, span, a {
@@ -143,7 +166,7 @@ export default {
 </script>
 
 <style scoped>
-.export-pdf-button {
+.render-pdf-button {
   display: flex;
   justify-content: center;
   align-items: center;
