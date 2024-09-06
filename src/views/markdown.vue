@@ -1,8 +1,6 @@
 <template>
   <div class="components-container">
     <div class="editor-container" id="editor"></div>
-
-    <!-- Ensure the text and icon are centered within the button -->
     <ElButton
         class="export-pdf-button"
         type="primary"
