@@ -93,10 +93,10 @@ export default {
     async renderPDF() {
       let markdownHTML = '';
 
-      if (this.editor.isWysiwygMode()) {
-        markdownHTML = this.editor.getHTML();
-      } else if (this.editor.isMarkdownMode()) {
-        const markdownContent = this.editor.getMarkdown();
+      if (editor.isWysiwygMode()) {
+        markdownHTML = editor.getHTML();
+      } else if (editor.isMarkdownMode()) {
+        const markdownContent = editor.getMarkdown();
         markdownHTML = marked(markdownContent);
       }
 
