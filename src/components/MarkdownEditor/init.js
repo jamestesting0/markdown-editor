@@ -58,6 +58,7 @@ export default function initializeEditor(elementId = null, content = '') {
         previewStyle: 'vertical',
         height: '500px',
         initialValue: content,
+        initialEditType: "markdown",
         toolbarItems: [
             ['heading', 'bold', 'italic', 'strike'],
             ['hr', 'quote'],

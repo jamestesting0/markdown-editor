@@ -6,7 +6,7 @@
           class="import-button"
           action="https://jsonplaceholder.typicode.com/posts/"
           accept=".md, .txt"
-          :on-success="importMD"
+          :on-change="importMD"
           multiple
           :limit="1">
         <el-button
@@ -50,6 +50,8 @@ const content = `**This is test**
 * element
 * webpack`;
 
+let editor = null;
+
 export default {
   components: {
     ElButton,
@@ -57,17 +59,33 @@ export default {
   },
   data() {
     return {
-      editor: null,
       content: content,
-      html: '',
     };
   },
   mounted() {
-    this.editor = initializeEditor('editor', this.content);
+    editor = initializeEditor('editor', this.content);
   },
   methods: {
     async importMD(res) {
-      // TODO
+      const file = res.raw || res.file;  // Ensure correct file object
+
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+          const fileContent = e.target.result;
+
+          if (fileContent) {
+            editor.setMarkdown(fileContent);
+          } else {
+            console.error("Uploaded file is empty");
+          }
+        };
+
+        reader.readAsText(file);
+      } else {
+        console.error("No file uploaded");
+      }
     },
     async exportMD() {
       // TODO
@@ -178,9 +196,13 @@ export default {
 }
 
 .editor-container {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   height: 300px;
   border: 1px solid #ddd;
+}
+
+.export-button {
+  margin-left: 12px;
 }
 </style>
 
