@@ -17,6 +17,7 @@
     "jspdf": "^2.5.1",
     "latex.js": "^0.12.6",
     "marked": "^14.1.1",
+    "tui-editor-plugin-font-size": "^1.0.4",
     "vue": "^3.0.0"
   },
   "devDependencies": {

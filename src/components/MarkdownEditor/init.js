@@ -2,6 +2,8 @@ import '@toast-ui/editor/dist/toastui-editor.css';
 import {Editor} from '@toast-ui/editor';
 import {parse, HtmlGenerator} from 'latex.js';
 import imgSrc from './latex.png'
+import fontSize from "tui-editor-plugin-font-size";
+import "tui-editor-plugin-font-size/dist/tui-editor-plugin-font-size.css";
 
 export default function initializeEditor(elementId = null, content = '') {
     // generate and create the editor element
@@ -82,7 +84,8 @@ export default function initializeEditor(elementId = null, content = '') {
                     { type: 'closeTag', tagName: 'div', outerNewLine: true }
                 ];
             },
-        }
+        },
+        plugins: [fontSize]
     });
 
     return editor;

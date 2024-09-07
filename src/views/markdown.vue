@@ -66,8 +66,12 @@ export default {
     this.editor = initializeEditor('editor', this.content);
   },
   methods: {
-    async importMD(res) {},
-    async exportMD() {},
+    async importMD(res) {
+      // TODO
+    },
+    async exportMD() {
+      // TODO
+    },
     async renderPDF() {
       let markdownHTML = '';
 
