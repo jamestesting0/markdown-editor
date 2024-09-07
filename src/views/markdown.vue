@@ -174,6 +174,7 @@ export default {
       wrapper.innerHTML = tempElement.innerHTML;
       document.body.appendChild(wrapper);
 
+      // Render MATHML
       if (this.isMathJaxLoaded) {
         await MathJax.typesetPromise([wrapper]);
       } else {
