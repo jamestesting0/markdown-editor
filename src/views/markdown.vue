@@ -37,9 +37,7 @@
 </template>
 
 <script>
-import {jsPDF} from 'jspdf';
 import {marked} from 'marked';
-import html2canvas from 'html2canvas';
 import {ElButton} from 'element-plus';
 import {Download} from '@element-plus/icons-vue';
 import initializeEditor from '@/components/MarkdownEditor/init';
@@ -83,7 +81,7 @@ export default {
       document.head.appendChild(script);
     },
     async importMD(res) {
-      const file = res.raw || res.file;  // Ensure correct file object
+      const file = res.raw || res.file;
 
       if (file) {
         const reader = new FileReader();
@@ -104,7 +102,24 @@ export default {
       }
     },
     async exportMD() {
-      // TODO
+      const markdownContent = editor.getMarkdown();
+      if (!markdownContent) {
+        console.error("No content to export");
+        return;
+      }
+
+      // Create a Blob object with the markdown content
+      const blob = new Blob([markdownContent], { type: 'text/markdown' });
+
+      // Create a download link and simulate a click to download the file
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'exported-content.md';
+
+      // Append link to body, click it, and then remove it
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     },
     async renderPDF() {
       let markdownHTML = '';
