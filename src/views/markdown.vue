@@ -43,6 +43,8 @@ import html2canvas from 'html2canvas';
 import {ElButton} from 'element-plus';
 import {Download} from '@element-plus/icons-vue';
 import initializeEditor from '@/components/MarkdownEditor/init';
+import html2pdf from 'html2pdf.js';
+
 
 const content = `**This is test**
 
@@ -60,12 +62,26 @@ export default {
   data() {
     return {
       content: content,
+      isMathJaxLoaded: false,
     };
   },
   mounted() {
     editor = initializeEditor('editor', this.content);
+    this.loadMathJax();
   },
   methods: {
+    loadMathJax() {
+      if (this.isMathJaxLoaded) return;
+
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.async = true;
+      script.onload = () => {
+        this.isMathJaxLoaded = true;
+        console.log('MathJax loaded');
+      };
+      document.head.appendChild(script);
+    },
     async importMD(res) {
       const file = res.raw || res.file;  // Ensure correct file object
 
@@ -93,32 +109,34 @@ export default {
     async renderPDF() {
       let markdownHTML = '';
 
+      // Get the HTML or Markdown content from the editor
       if (editor.isWysiwygMode()) {
         markdownHTML = editor.getHTML();
+        console.log(markdownHTML);
       } else if (editor.isMarkdownMode()) {
         const markdownContent = editor.getMarkdown();
         markdownHTML = marked(markdownContent);
       }
 
-      // create an off-screen element to render the HTML content
+      // Create a temporary element to hold the content for rendering
       const tempElement = document.createElement('div');
       tempElement.innerHTML = markdownHTML;
 
-      // apply CSS to set text size to 12px and ensure margins similar to Google Docs
+      // Apply CSS to ensure text wrapping and proper styling
       const style = document.createElement('style');
       style.innerHTML = `
         body, div, p, ul, li, span, a {
           font-size: 12px;
-            line-height: 1.6;
-            font-family: Arial, sans-serif;
-            margin: 0;
-          }
-        .content-wrapper {
-          padding-top: 25.4mm;
-          padding-bottom: 25.4mm;
-          padding-left: 25.4mm;
-          padding-right: 25.4mm;
-          width: auto;
+          line-height: 1.6;
+          font-family: Arial, sans-serif;
+          margin: 0;
+          word-wrap: break-word;
+        }
+        pre, code, blockquote, table {
+          page-break-inside: avoid;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
         }
         h1 {
           font-size: 26px;
@@ -144,44 +162,37 @@ export default {
           font-size: 14px;
           margin-bottom: 2px;
         }
+        .page-break {
+          page-break-before: always; /* Forces content after this class to be on a new page */
+        }
       `;
       tempElement.appendChild(style);
 
-      // wrap content inside a container with margins
+      // Wrap the content inside a container with the necessary margins
       const wrapper = document.createElement('div');
       wrapper.classList.add('content-wrapper');
       wrapper.innerHTML = tempElement.innerHTML;
       document.body.appendChild(wrapper);
 
-      // capture the content of the element as an image
-      const canvas = await html2canvas(wrapper, {
-        scale: 4,  // resolution
-      });
-
-      // generate the PDF
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgData = canvas.toDataURL('image/png');
-      const imgWidth = 210;  // A4 width in mm
-      const pageHeight = 297;  // A4 height in mm
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      // add the image of the content to the PDF
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      // add more pages if needed
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      if (this.isMathJaxLoaded) {
+        await MathJax.typesetPromise([wrapper]);
+      } else {
+        console.error("MathJax is not loaded yet");
       }
 
-      document.body.removeChild(wrapper);
+      // Use html2pdf to generate the PDF from the content
+      const options = {
+        margin: [25.4, 25.4, 25.4, 25.4], // Margins in mm
+        filename: 'exported-markdown.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+      };
 
-      pdf.save('exported-markdown.pdf');
+      await html2pdf().from(wrapper).set(options).save();
+
+      // Remove the temporary element after generating the PDF
+      document.body.removeChild(wrapper);
     }
   }
 };
