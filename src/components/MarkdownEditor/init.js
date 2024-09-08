@@ -72,7 +72,7 @@ export default function initializeEditor(elementId = null) {
                 const generator = new HtmlGenerator({ hyphenate: false });
                 const { body } = parse(node.literal, { generator: generator }).htmlDocument();
 
-                // remove the katex-html part as it looks ugly and is unnecessary
+                // Remove the katex-html part as it looks ugly and is unnecessary
                 let tempElement = document.createElement('div');
                 tempElement.innerHTML = body.innerHTML;
                 tempElement.querySelectorAll('.katex-html').forEach(element => {
