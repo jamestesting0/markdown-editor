@@ -5,8 +5,8 @@ import imgSrc from './latex.png'
 import fontSize from "tui-editor-plugin-font-size";
 import "tui-editor-plugin-font-size/dist/tui-editor-plugin-font-size.css";
 
-export default function initializeEditor(elementId = null, content = '') {
-    // generate and create the editor element
+export default function initializeEditor(elementId = null) {
+    // Generate and create the editor element
     const generatedId = elementId || 'markdown-editor-' + +new Date() + ((Math.random() * 1000).toFixed(0) + '');
 
     let editorElement = document.querySelector(`#${generatedId}`);
@@ -17,7 +17,7 @@ export default function initializeEditor(elementId = null, content = '') {
         document.body.appendChild(editorElement);
     }
 
-    // create the Latex toolbar button
+    // Create the Latex toolbar button
     const latexIcon = document.createElement('img');
     latexIcon.src = imgSrc;
     latexIcon.style.width = '24px;';
@@ -52,13 +52,13 @@ export default function initializeEditor(elementId = null, content = '') {
         el: latexButton,
     }
 
-    // create the custom editor
+    // Create the custom editor
     const editor = new Editor({
         el: editorElement,
         previewStyle: 'vertical',
         height: '500px',
-        initialValue: content,
         initialEditType: "markdown",
+        placeholder: "Please enter your text here",
         toolbarItems: [
             ['heading', 'bold', 'italic', 'strike'],
             ['hr', 'quote'],
@@ -86,7 +86,35 @@ export default function initializeEditor(elementId = null, content = '') {
                 ];
             },
         },
-        plugins: [fontSize]
+        plugins: [fontSize],
+        hooks: {
+            // Instead of using base64, we use cloudinary API to host it as an URL
+            async addImageBlobHook(blob, callback) {
+                const formData = new FormData();
+                formData.append('file', blob);
+                formData.append('upload_preset', 'ml_default');
+                formData.append('api_key', '237145998445384');
+
+                try {
+                    const response = await fetch('https://api.cloudinary.com/v1_1/your_cloud_name/image/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const uploadResult = await response.json();
+
+                    if (uploadResult.secure_url) {
+                        const altText = document.getElementById('toastuiAltTextInput');
+                        console.log(altText.textContent);
+                        callback(uploadResult.secure_url, altText.textContent);
+                    } else {
+                        console.error('Upload failed:', uploadResult);
+                    }
+                } catch (error) {
+                    console.error('Error uploading the image:', error);
+                }
+            }
+        }
     });
 
     return editor;

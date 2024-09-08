@@ -137,6 +137,9 @@ export default {
       const tempElement = document.createElement('div');
       tempElement.innerHTML = markdownHTML;
 
+      // Convert image URLs to base64, otherwise they do not get rendered in the PDF
+      await this.convertImagesToBase64(tempElement);
+
       // Apply CSS to ensure text wrapping and proper styling
       const style = document.createElement('style');
       style.innerHTML = `
@@ -209,6 +212,36 @@ export default {
 
       // Remove the temporary element after generating the PDF
       document.body.removeChild(wrapper);
+    },
+    async convertImagesToBase64(element) {
+      const images = element.querySelectorAll('img');
+      const promises = [];
+
+      images.forEach((img) => {
+        promises.push(
+            new Promise(async (resolve, reject) => {
+              try {
+                const response = await fetch(img.src);
+                const blob = await response.blob();
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  img.src = reader.result;
+                  resolve();
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+              } catch (error) {
+                reject(error);
+              }
+            })
+        );
+      });
+
+      try {
+        await Promise.all(promises);
+      } catch (error) {
+        console.error("Error converting images to base64:", error);
+      }
     }
   }
 };
@@ -224,8 +257,10 @@ export default {
 
 .editor-container {
   margin-bottom: 20px;
-  height: 300px;
+  height: 500px;
   border: 1px solid #ddd;
+  resize: vertical;
+  overflow: hidden;
 }
 
 .export-button {
