@@ -156,6 +156,19 @@ export default {
           word-wrap: break-word;
           overflow-wrap: break-word;
         }
+        table, th, td {
+          border: 1px solid black;
+          border-collapse: collapse;
+          padding: 8px;
+        }
+
+        th {
+          font-weight: bold;
+        }
+
+        td {
+          text-align: left;
+        }
         h1 {
           font-size: 26px;
           margin-bottom: 12px;
@@ -206,6 +219,7 @@ export default {
         image: { type: 'jpeg', quality: 0.98 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+        html2canvas: { scale: 4, useCORS: true },
       };
 
       await html2pdf().from(wrapper).set(options).save();
