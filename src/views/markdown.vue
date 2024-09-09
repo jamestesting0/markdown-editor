@@ -255,19 +255,19 @@ export default {
 </script>
 
 <style scoped>
-.render-pdf-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: auto;
-}
-
 .editor-container {
   margin-bottom: 20px;
   height: 500px;
   border: 1px solid #ddd;
   resize: vertical;
   overflow: hidden;
+}
+
+.render-pdf-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: auto;
 }
 
 .export-button {
