@@ -1,9 +1,15 @@
 import '@toast-ui/editor/dist/toastui-editor.css';
+import "tui-editor-plugin-font-size/dist/tui-editor-plugin-font-size.css";
+import 'prismjs/themes/prism.css';
+import '@toast-ui/editor-plugin-code-syntax-highlight/dist/toastui-editor-plugin-code-syntax-highlight.css';
+
 import {Editor} from '@toast-ui/editor';
 import {parse, HtmlGenerator} from 'latex.js';
 import imgSrc from './latex.png'
 import fontSize from "tui-editor-plugin-font-size";
-import "tui-editor-plugin-font-size/dist/tui-editor-plugin-font-size.css";
+import codeSyntaxHighlight from '@toast-ui/editor-plugin-code-syntax-highlight';
+import Prism from 'prismjs';
+import 'prismjs/components/prism-clojure.js';
 
 export default function initializeEditor(elementId = null) {
     // Generate and create the editor element
@@ -85,11 +91,62 @@ export default function initializeEditor(elementId = null) {
                     { type: 'closeTag', tagName: 'div', outerNewLine: true }
                 ];
             },
+            img(node) {
+                console.log(node.literal)
+                const regex = /\[(.*?)]\((.*?)\)/;
+                const match = node.literal.match(regex);
+
+                const lines = node.literal
+                    .split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0);
+                const imgAttributes = {};
+                let style = "";
+                lines.forEach(line => {
+                    if (!regex.test(line)) {
+                        const [key, value] = line.split(':').map(item => item.trim());
+                        if (key && value) {
+                            if (key === "width" || key === "height") {
+                                imgAttributes[key] = value;
+                            } else {
+                                style += `${key}:${value};`;
+                            }
+                        }
+                    }
+                });
+
+                if (!match) {
+                    console.log("failed")
+                    return[
+                        { type: 'openTag', tagName: 'div', outerNewLine: true },
+                        { type: 'closeTag', tagName: 'div', outerNewLine: true }
+                    ]
+                }
+
+                imgAttributes['alt'] = match[1];
+                imgAttributes['src'] = match[2];
+                if (style) {
+                    imgAttributes['style'] = style;
+                }
+                console.log(imgAttributes);
+
+                return [
+                    { type: 'openTag', tagName: 'div', outerNewLine: true },
+                    {
+                        type: 'openTag',
+                        tagName: 'img',
+                        outerNewLine: false,
+                        attributes: imgAttributes,
+                        selfClosing: true
+                    },
+                    { type: 'closeTag', tagName: 'div', outerNewLine: true }
+                ];
+            }
         },
-        plugins: [fontSize],
+        plugins: [fontSize, [codeSyntaxHighlight, { highlighter: Prism }]],
         hooks: {
             // Instead of using base64, we use cloudinary API to host it as an URL
-            async addImageBlobHook(blob, callback) {
+            async addImageBlobHook(blob) {
                 const formData = new FormData();
                 formData.append('file', blob);
                 formData.append('upload_preset', 'ml_default');
@@ -106,7 +163,14 @@ export default function initializeEditor(elementId = null) {
                     if (uploadResult.secure_url) {
                         const altText = document.getElementById('toastuiAltTextInput');
                         console.log(altText.textContent);
-                        callback(uploadResult.secure_url, altText.textContent);
+                        editor.insertText(
+                            "$$img\n" +
+                            "Tip: add any CSS styles as key value pairs below to customize the image\n" +
+                            "width:auto\n" +
+                            "height:auto\n" +
+                            `![${altText.textContent}](${uploadResult.secure_url})\n` +
+                            "$$"
+                        )
                     } else {
                         console.error('Upload failed:', uploadResult);
                     }

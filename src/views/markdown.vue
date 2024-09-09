@@ -37,7 +37,6 @@
 </template>
 
 <script>
-import {marked} from 'marked';
 import {ElButton} from 'element-plus';
 import {Download} from '@element-plus/icons-vue';
 import initializeEditor from '@/components/MarkdownEditor/init';
@@ -125,13 +124,7 @@ export default {
       let markdownHTML = '';
 
       // Get the HTML or Markdown content from the editor
-      if (editor.isWysiwygMode()) {
-        markdownHTML = editor.getHTML();
-        console.log(markdownHTML);
-      } else if (editor.isMarkdownMode()) {
-        const markdownContent = editor.getMarkdown();
-        markdownHTML = marked(markdownContent);
-      }
+      markdownHTML = editor.getHTML();
 
       // Create a temporary element to hold the content for rendering
       const tempElement = document.createElement('div');
