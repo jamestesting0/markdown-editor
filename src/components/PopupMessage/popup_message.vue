@@ -32,7 +32,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.3s ease;
 }
@@ -40,9 +40,7 @@ export default {
 .fade-enter, .fade-leave-to {
   opacity: 0;
 }
-</style>
 
-<style scoped>
 .popup-message {
   position: fixed;
   bottom: 20px;

@@ -64,7 +64,7 @@ export default {
   },
   methods: {
     logError(message) {
-      this.logError(message);
+      console.error(message);
       this.errorMessage = message;
 
       setTimeout(() => {
