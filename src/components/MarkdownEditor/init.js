@@ -2,12 +2,15 @@ import '@toast-ui/editor/dist/toastui-editor.css';
 import "tui-editor-plugin-font-size/dist/tui-editor-plugin-font-size.css";
 import 'prismjs/themes/prism.css';
 import '@toast-ui/editor-plugin-code-syntax-highlight/dist/toastui-editor-plugin-code-syntax-highlight.css';
+import 'tui-color-picker/dist/tui-color-picker.css';
+import '@toast-ui/editor-plugin-color-syntax/dist/toastui-editor-plugin-color-syntax.css';
 
 import {Editor} from '@toast-ui/editor';
 import {parse, HtmlGenerator} from 'latex.js';
 import imgSrc from './latex.png'
 import fontSize from "tui-editor-plugin-font-size";
 import codeSyntaxHighlight from '@toast-ui/editor-plugin-code-syntax-highlight';
+import colorSyntax from '@toast-ui/editor-plugin-color-syntax';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-clojure.js';
 
@@ -143,9 +146,13 @@ export default function initializeEditor(elementId = null) {
                 ];
             }
         },
-        plugins: [fontSize, [codeSyntaxHighlight, { highlighter: Prism }]],
+        plugins: [
+            fontSize,
+            [codeSyntaxHighlight, { highlighter: Prism }],
+            colorSyntax,
+        ],
         hooks: {
-            // Instead of using base64, we use cloudinary API to host it as an URL
+            // Instead of using base64, we use cloudinary API to host it as a URL
             async addImageBlobHook(blob) {
                 const formData = new FormData();
                 formData.append('file', blob);
