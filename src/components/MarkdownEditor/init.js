@@ -42,14 +42,16 @@ export default function initializeEditor(elementId = null) {
     latexButton.appendChild(latexIcon);
     latexButton.addEventListener('click', () => {
         const selectionPos = editor.getSelection()[0];
-        editor.insertText(
-            '$$latex\n' +
+        let latexText = '$$latex\n' +
             '\\documentclass{article}\n' +
             '\\begin{document}\n\n' +
             '$\n\n$\n\n' +
             '\\end{document}\n' +
             '$$'
-        );
+        if (selectionPos[1] !== 1) {
+            latexText = "\n" + latexText;
+        }
+        editor.insertText(latexText);
         selectionPos[0] = selectionPos[0] + 5
         selectionPos[1] = selectionPos[1]
         editor.setSelection(selectionPos)
@@ -95,7 +97,6 @@ export default function initializeEditor(elementId = null) {
                 ];
             },
             img(node) {
-                console.log(node.literal)
                 const regex = /\[(.*?)]\((.*?)\)/;
                 const match = node.literal.match(regex);
 
@@ -119,7 +120,6 @@ export default function initializeEditor(elementId = null) {
                 });
 
                 if (!match) {
-                    console.log("failed")
                     return[
                         { type: 'openTag', tagName: 'div', outerNewLine: true },
                         { type: 'closeTag', tagName: 'div', outerNewLine: true }
@@ -131,7 +131,6 @@ export default function initializeEditor(elementId = null) {
                 if (style) {
                     imgAttributes['style'] = style;
                 }
-                console.log(imgAttributes);
 
                 return [
                     { type: 'openTag', tagName: 'div', outerNewLine: true },
@@ -169,15 +168,16 @@ export default function initializeEditor(elementId = null) {
 
                     if (uploadResult.secure_url) {
                         const altText = document.getElementById('toastuiAltTextInput');
-                        console.log(altText.textContent);
-                        editor.insertText(
-                            "$$img\n" +
+                        let imgText = "$$img\n" +
                             "Tip: add any CSS styles as key value pairs below to customize the image\n" +
                             "width:auto\n" +
                             "height:auto\n" +
                             `![${altText.textContent}](${uploadResult.secure_url})\n` +
                             "$$"
-                        )
+                        if (editor.getSelection()[0][1] !== 1) {
+                            imgText = "\n" + imgText;
+                        }
+                        editor.insertText(imgText);
                     } else {
                         console.error('Upload failed:', uploadResult);
                     }
