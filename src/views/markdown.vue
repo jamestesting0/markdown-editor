@@ -63,7 +63,7 @@ export default {
     };
   },
   mounted() {
-    editor = initializeEditor('editor', this.content);
+    editor = initializeEditor('editor');
     this.loadMathJax();
   },
   methods: {
