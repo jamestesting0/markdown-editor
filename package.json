@@ -20,8 +20,7 @@
     "latex.js": "^0.12.6",
     "mathjax": "^3.2.2",
     "prismjs": "^1.29.0",
-    "tui-editor-plugin-font-size": "^1.0.4",
-    "vue": "^3.0.0"
+    "tui-editor-plugin-font-size": "^1.0.4"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~5.0.0",

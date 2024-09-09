@@ -33,6 +33,7 @@
         Render as PDF
       </el-button>
     </el-row>
+    <PopupMessage :message="errorMessage" />
   </div>
 </template>
 
@@ -41,25 +42,20 @@ import {ElButton} from 'element-plus';
 import {Download} from '@element-plus/icons-vue';
 import initializeEditor from '@/components/MarkdownEditor/init';
 import html2pdf from 'html2pdf.js';
-
-
-const content = `**This is test**
-
-* vue
-* element
-* webpack`;
+import PopupMessage from '../components/PopupMessage/popup_message.vue';
 
 let editor = null;
 
 export default {
   components: {
     ElButton,
-    Download
+    Download,
+    PopupMessage,
   },
   data() {
     return {
-      content: content,
       isMathJaxLoaded: false,
+      errorMessage: '',
     };
   },
   mounted() {
@@ -67,6 +63,14 @@ export default {
     this.loadMathJax();
   },
   methods: {
+    logError(message) {
+      this.logError(message);
+      this.errorMessage = message;
+
+      setTimeout(() => {
+        this.errorMessage = '';
+      }, 3000);
+    },
     loadMathJax() {
       if (this.isMathJaxLoaded) return;
 
@@ -91,23 +95,23 @@ export default {
           if (fileContent) {
             editor.setMarkdown(fileContent);
           } else {
-            console.error("Uploaded file is empty");
+            this.logError("Uploaded file is empty");
           }
         };
 
         reader.readAsText(file);
       } else {
-        console.error("No file uploaded");
+        this.logError("No file uploaded");
       }
     },
     async exportMD() {
       const markdownContent = editor.getMarkdown();
       if (!markdownContent) {
-        console.error("No content to export");
+        this.logError("No content to export")
         return;
       }
 
-      // Create a Blob object with the markdown content
+      // Create a Blob object with the Markdown content
       const blob = new Blob([markdownContent], { type: 'text/markdown' });
 
       // Create a download link and simulate a click to download the file
@@ -115,7 +119,7 @@ export default {
       link.href = URL.createObjectURL(blob);
       link.download = 'exported-content.md';
 
-      // Append link to body, click it, and then remove it
+      // Append a link to the body, click it, and then remove it
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -202,7 +206,7 @@ export default {
       if (this.isMathJaxLoaded) {
         await MathJax.typesetPromise([wrapper]);
       } else {
-        console.error("MathJax is not loaded yet");
+        this.logError("MathJax is not loaded yet");
       }
 
       // Use html2pdf to generate the PDF from the content
@@ -247,7 +251,7 @@ export default {
       try {
         await Promise.all(promises);
       } catch (error) {
-        console.error("Error converting images to base64:", error);
+        this.logError("Error converting images to base64:", error);
       }
     }
   }
