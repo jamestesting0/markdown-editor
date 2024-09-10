@@ -158,6 +158,14 @@ export default function initializeEditor(elementId = null) {
                 formData.append('upload_preset', 'ml_default');
                 formData.append('api_key', '237145998445384');
 
+                // Find the OK button (toastui-editor-ok-button) and set it to a loading state
+                const okButton = document.querySelector('.toastui-editor-ok-button');
+                if (okButton) {
+                    okButton.classList.add('loading');
+                    okButton.innerHTML = 'Uploading...'; // Set button text to show it's in loading state
+                    okButton.disabled = true; // Disable the button to prevent further interaction
+                }
+
                 try {
                     const response = await fetch('https://api.cloudinary.com/v1_1/your_cloud_name/image/upload', {
                         method: 'POST',
@@ -173,7 +181,7 @@ export default function initializeEditor(elementId = null) {
                             "width:auto\n" +
                             "height:auto\n" +
                             `![${altText.textContent}](${uploadResult.secure_url})\n` +
-                            "$$"
+                            "$$";
                         if (editor.getSelection()[0][1] !== 1) {
                             imgText = "\n" + imgText;
                         }
@@ -183,6 +191,13 @@ export default function initializeEditor(elementId = null) {
                     }
                 } catch (error) {
                     console.error('Error uploading the image:', error);
+                } finally {
+                    // Revert the OK button back to its normal state after upload is complete
+                    if (okButton) {
+                        okButton.classList.remove('loading');
+                        okButton.innerHTML = 'OK'; // Reset button text
+                        okButton.disabled = false; // Re-enable the button
+                    }
                 }
             }
         }

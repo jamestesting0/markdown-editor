@@ -1,6 +1,18 @@
 <template>
   <div class="components-container">
+    <div>
+      <el-button
+          class="switch-mode-button"
+          type="info"
+          plain
+          @click="toggleMode"
+          :disabled="!hasPermission()"
+          :icon="getIcon()">
+        {{ isViewerMode ? 'Switch to Editor' : 'Switch to Viewer' }}
+      </el-button>
+    </div>
     <div class="editor-container" id="editor"></div>
+    <div class="viewer-container" id="viewer" style="display: none;"></div>
     <el-row>
       <el-upload
           class="import-button"
@@ -8,11 +20,9 @@
           accept=".md, .txt"
           :on-change="importMD"
           multiple
-          :limit="1">
-        <el-button
-            type="primary"
-            plain
-            icon="Upload">
+          :limit="1"
+          :disabled="!hasPermission()">
+        <el-button type="primary" plain icon="Upload" :disabled="!hasPermission()">
           Import
         </el-button>
       </el-upload>
@@ -38,13 +48,15 @@
 </template>
 
 <script>
-import {ElButton} from 'element-plus';
-import {Download} from '@element-plus/icons-vue';
-import initializeEditor from '@/components/MarkdownEditor/init';
+import { ElButton } from 'element-plus';
+import { Download } from '@element-plus/icons-vue';
+import initializeEditor from '@/components/MarkdownEditor/editor_init';
+import initializeViewer from '@/components/MarkdownEditor/viewer_init';
 import html2pdf from 'html2pdf.js';
 import PopupMessage from '../components/PopupMessage/popup_message.vue';
 
 let editor = null;
+let viewer = null;
 
 export default {
   components: {
@@ -54,19 +66,63 @@ export default {
   },
   data() {
     return {
+      isViewerMode: false,
       isMathJaxLoaded: false,
       errorMessage: '',
     };
   },
   mounted() {
-    editor = initializeEditor('editor');
+    this.initializeEditor();
+    this.initializeViewer();
     this.loadMathJax();
+    this.checkPermissions();
   },
   methods: {
+    checkPermissions() {
+      if (!this.hasPermission()) {
+        this.isViewerMode = true;
+        this.showViewer();
+      }
+    },
+    hasPermission() {
+      // TODO: implement custom logic for permission checks
+      return true;
+    },
+    getIcon() {
+      return this.isViewerMode ? "Edit" : "View"
+    },
+    toggleMode() {
+      if (this.hasPermission()) {
+        this.isViewerMode = !this.isViewerMode;
+        if (this.isViewerMode) {
+          this.showViewer();
+        } else {
+          this.showEditor();
+        }
+      }
+    },
+    initializeEditor() {
+      editor = initializeEditor('editor');
+    },
+    initializeViewer() {
+      viewer = initializeViewer('viewer');
+    },
+    syncViewer() {
+      const markdownContent = editor.getMarkdown();
+      viewer.setMarkdown(markdownContent);
+    },
+    showEditor() {
+      document.getElementById('editor').style.display = 'block';
+      document.getElementById('viewer').style.display = 'none';
+    },
+    showViewer() {
+      this.syncViewer();
+      document.getElementById('editor').style.display = 'none';
+      document.getElementById('viewer').style.display = 'block';
+    },
     logError(message) {
       console.error(message);
       this.errorMessage = message;
-
       setTimeout(() => {
         this.errorMessage = '';
       }, 3000);
@@ -261,10 +317,21 @@ export default {
 <style scoped>
 .editor-container {
   margin-bottom: 20px;
+  margin-top: 20px;
   height: 500px;
   border: 1px solid #ddd;
   resize: vertical;
   overflow: hidden;
+}
+
+.viewer-container {
+  margin-bottom: 20px;
+  margin-top: 20px;
+  height: 500px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  overflow-y: auto;
+  resize: vertical;
 }
 
 .render-pdf-button {
