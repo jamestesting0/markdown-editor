@@ -22,3 +22,9 @@ Currently, no encryption/decryption is implemented to protect sensitive data. He
 2. Storing of Markdown files
 3. Upload of images to for cloud hosting
    1. The editor uses Cloudinary (third-party API) to host local images in the cloud. To add encryption, developing custom image hosting API is probably necessary.
+
+## Running the Demo
+```shell
+npm install
+npm run serve
+```
