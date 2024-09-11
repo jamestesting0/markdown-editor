@@ -6,13 +6,14 @@ import 'tui-color-picker/dist/tui-color-picker.css';
 import '@toast-ui/editor-plugin-color-syntax/dist/toastui-editor-plugin-color-syntax.css';
 
 import {Editor} from '@toast-ui/editor';
-import {parse, HtmlGenerator} from 'latex.js';
-import imgSrc from './latex.png'
+import latexImgSrc from './latex.png'
+import clearImgSrc from './clear.png'
 import fontSize from "tui-editor-plugin-font-size";
 import codeSyntaxHighlight from '@toast-ui/editor-plugin-code-syntax-highlight';
 import colorSyntax from '@toast-ui/editor-plugin-color-syntax';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-clojure.js';
+import { customHTMLRenderer } from './html_renderer';
 
 export default function initializeEditor(elementId = null) {
     // Generate and create the editor element
@@ -28,7 +29,7 @@ export default function initializeEditor(elementId = null) {
 
     // Create the Latex toolbar button
     const latexIcon = document.createElement('img');
-    latexIcon.src = imgSrc;
+    latexIcon.src = latexImgSrc;
     latexIcon.style.width = '24px;';
     latexIcon.style.height = '24px';
     latexIcon.style.marginTop = '2px';
@@ -63,6 +64,30 @@ export default function initializeEditor(elementId = null) {
         el: latexButton,
     }
 
+    // Create the Clear Content toolbar button
+    const clearIcon = document.createElement('img');
+    clearIcon.src = clearImgSrc;
+    clearIcon.style.width = '24px;';
+    clearIcon.style.height = '24px';
+    clearIcon.style.marginTop = '2px';
+
+    const clearButton = document.createElement('button');
+    clearButton.style.cursor = 'pointer';
+    clearButton.style.background = 'none';
+    clearButton.style.alignSelf = 'center';
+    clearButton.style.color = '#FF0000';
+    clearButton.style.setProperty('margin', '0px', 'important');
+    clearButton.appendChild(clearIcon);
+    clearButton.addEventListener('click', () => {
+        editor.setMarkdown('');
+    });
+
+    const clearTool = {
+        name: 'Clear content',
+        tooltip: 'Clear content',
+        el: clearButton,
+    };
+
     // Create the custom editor
     const editor = new Editor({
         el: editorElement,
@@ -75,76 +100,10 @@ export default function initializeEditor(elementId = null) {
             ['hr', 'quote'],
             ['ul', 'ol', 'task'],
             ['table', 'image', 'link'],
-            ['code', 'codeblock', latexTool],
+            ['code', 'codeblock', latexTool, clearTool],
             ['scrollSync'],
         ],
-        customHTMLRenderer: {
-            latex(node) {
-                const generator = new HtmlGenerator({ hyphenate: false });
-                const { body } = parse(node.literal, { generator: generator }).htmlDocument();
-
-                // Remove the katex-html part as it looks ugly and is unnecessary
-                let tempElement = document.createElement('div');
-                tempElement.innerHTML = body.innerHTML;
-                tempElement.querySelectorAll('.katex-html').forEach(element => {
-                    element.remove();
-                });
-
-                return [
-                    { type: 'openTag', tagName: 'div', outerNewLine: true },
-                    { type: 'html', content: tempElement.innerHTML },
-                    { type: 'closeTag', tagName: 'div', outerNewLine: true }
-                ];
-            },
-            img(node) {
-                const regex = /\[(.*?)]\((.*?)\)/;
-                const match = node.literal.match(regex);
-
-                const lines = node.literal
-                    .split('\n')
-                    .map(line => line.trim())
-                    .filter(line => line.length > 0);
-                const imgAttributes = {};
-                let style = "";
-                lines.forEach(line => {
-                    if (!regex.test(line)) {
-                        const [key, value] = line.split(':').map(item => item.trim());
-                        if (key && value) {
-                            if (key === "width" || key === "height") {
-                                imgAttributes[key] = value;
-                            } else {
-                                style += `${key}:${value};`;
-                            }
-                        }
-                    }
-                });
-
-                if (!match) {
-                    return[
-                        { type: 'openTag', tagName: 'div', outerNewLine: true },
-                        { type: 'closeTag', tagName: 'div', outerNewLine: true }
-                    ]
-                }
-
-                imgAttributes['alt'] = match[1];
-                imgAttributes['src'] = match[2];
-                if (style) {
-                    imgAttributes['style'] = style;
-                }
-
-                return [
-                    { type: 'openTag', tagName: 'div', outerNewLine: true },
-                    {
-                        type: 'openTag',
-                        tagName: 'img',
-                        outerNewLine: false,
-                        attributes: imgAttributes,
-                        selfClosing: true
-                    },
-                    { type: 'closeTag', tagName: 'div', outerNewLine: true }
-                ];
-            }
-        },
+        customHTMLRenderer: customHTMLRenderer,
         plugins: [
             fontSize,
             [codeSyntaxHighlight, { highlighter: Prism }],

@@ -1,13 +1,14 @@
 <template>
   <div class="components-container">
-    <div>
+    <div class="switch-button-container">
       <el-button
           class="switch-mode-button"
-          type="info"
+          type="primary"
           plain
           @click="toggleMode"
           :disabled="!hasPermission()"
-          :icon="getIcon()">
+          :icon="getIcon()"
+      >
         {{ isViewerMode ? 'Switch to Editor' : 'Switch to Viewer' }}
       </el-button>
     </div>
@@ -76,8 +77,32 @@ export default {
     this.initializeViewer();
     this.loadMathJax();
     this.checkPermissions();
+    this.loadMarkedLocal();
   },
   methods: {
+    saveMarkedLocal(content) {
+      // TODO: implement custom logic here
+      try {
+        localStorage.setItem('markedContent', content);
+        console.log("Content saved to localStorage");
+      } catch (e) {
+        this.logError("Failed to save content");
+      }
+    },
+    loadMarkedLocal() {
+      // TODO: implement custom logic here
+      try {
+        const savedContent = localStorage.getItem('markedContent');
+        if (savedContent) {
+          editor.setMarkdown(savedContent);
+          console.log("Content loaded from localStorage");
+        } else {
+          console.log("No content found in localStorage");
+        }
+      } catch (e) {
+        this.logError("Failed to load content");
+      }
+    },
     checkPermissions() {
       if (!this.hasPermission()) {
         this.isViewerMode = true;
@@ -103,6 +128,10 @@ export default {
     },
     initializeEditor() {
       editor = initializeEditor('editor');
+      editor.on("change", () => {
+        const content = editor.getMarkdown();
+        this.saveMarkedLocal(content);
+      });
     },
     initializeViewer() {
       viewer = initializeViewer('viewer');
@@ -317,7 +346,7 @@ export default {
 <style scoped>
 .editor-container {
   margin-bottom: 20px;
-  margin-top: 20px;
+  margin-top: 40px;
   height: 500px;
   border: 1px solid #ddd;
   resize: vertical;
@@ -326,7 +355,7 @@ export default {
 
 .viewer-container {
   margin-bottom: 20px;
-  margin-top: 20px;
+  margin-top: 40px;
   height: 500px;
   border: 1px solid #ddd;
   padding: 10px;
@@ -343,6 +372,28 @@ export default {
 
 .export-button {
   margin-left: 12px;
+}
+
+.switch-button-container {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: auto;
+  height: 0;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.switch-mode-button {
+  border: none;
+  cursor: pointer;
+  clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+  margin: 0;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 </style>
 
