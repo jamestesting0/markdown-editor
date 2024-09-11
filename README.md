@@ -13,8 +13,10 @@
 10. Free third-party image cloud hosting.
 
 ## Extending Functionalities
-1. `hasPermission()` method, which determines whether the user will be in editor or viewer mode.
-2. `loadMarked()` and `saveMarked()` methods, which can be customized based on how the Markdown content will be kept persistent.
+1. Customize `hasPermission()` method in `src/views/markdown.vue`, which determines whether the user will be in editor or viewer mode.
+2. Customize `loadMarked()` and `saveMarked()` methods in `src/views/markdown.vue`, which can be customized based on how the Markdown content will be kept persistent.
+3. Additional custom syntax can be added in `src/components/MarkdownEditor/html_renderers.js`
+4. Tools of the editor can be modified in `src/components/MarkdownEditor/editor_init.js`
 
 ## Adding Encryption
 Currently, no encryption/decryption is implemented to protect sensitive data. Here is a list of things that should potentially be encrypted.

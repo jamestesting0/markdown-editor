@@ -13,7 +13,7 @@ import codeSyntaxHighlight from '@toast-ui/editor-plugin-code-syntax-highlight';
 import colorSyntax from '@toast-ui/editor-plugin-color-syntax';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-clojure.js';
-import { customHTMLRenderer } from './html_renderer';
+import { customHTMLRenderer } from './html_renderers';
 
 export default function initializeEditor(elementId = null) {
     // Generate and create the editor element
