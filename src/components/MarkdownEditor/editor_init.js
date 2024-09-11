@@ -6,8 +6,8 @@ import 'tui-color-picker/dist/tui-color-picker.css';
 import '@toast-ui/editor-plugin-color-syntax/dist/toastui-editor-plugin-color-syntax.css';
 
 import {Editor} from '@toast-ui/editor';
-import latexImgSrc from './latex.png'
-import clearImgSrc from './clear.png'
+import latexImgSrc from '../../../assets/latex.png'
+import clearImgSrc from '../../../assets/clear.png'
 import fontSize from "tui-editor-plugin-font-size";
 import codeSyntaxHighlight from '@toast-ui/editor-plugin-code-syntax-highlight';
 import colorSyntax from '@toast-ui/editor-plugin-color-syntax';
