@@ -43,14 +43,21 @@
           @click="renderPDF">
         Render as PDF
       </el-button>
+      <el-button
+          class="download-html-button"
+          type="primary"
+          plain
+          icon="Share"
+          @click="downloadHTML">
+        Download HTML
+      </el-button>
     </el-row>
     <PopupMessage :message="errorMessage" />
   </div>
 </template>
 
 <script>
-import { ElButton } from 'element-plus';
-import { Download } from '@element-plus/icons-vue';
+import { ElButton, ElUpload } from 'element-plus';
 import initializeEditor from '@/components/MarkdownEditor/editor_init';
 import initializeViewer from '@/components/MarkdownEditor/viewer_init';
 import html2pdf from 'html2pdf.js';
@@ -62,7 +69,7 @@ let viewer = null;
 export default {
   components: {
     ElButton,
-    Download,
+    ElUpload,
     PopupMessage,
   },
   data() {
@@ -84,7 +91,6 @@ export default {
       // TODO: implement custom logic here
       try {
         localStorage.setItem('markedContent', content);
-        console.log("Content saved to localStorage");
       } catch (e) {
         this.logError("Failed to save content");
       }
@@ -95,9 +101,6 @@ export default {
         const savedContent = localStorage.getItem('markedContent');
         if (savedContent) {
           editor.setMarkdown(savedContent);
-          console.log("Content loaded from localStorage");
-        } else {
-          console.log("No content found in localStorage");
         }
       } catch (e) {
         this.logError("Failed to load content");
@@ -167,6 +170,38 @@ export default {
         console.log('MathJax loaded');
       };
       document.head.appendChild(script);
+    },
+    async downloadHTML() {
+      // Get the HTML content from the editor
+      const htmlContent = editor.getHTML();
+      if (!htmlContent) {
+        this.logError("No content to export");
+        return;
+      }
+
+      // Create a temporary wrapper to hold the HTML content
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = htmlContent;
+
+      // Remove all elements with the 'tool' class
+      const toolElements = wrapper.querySelectorAll('.tool');
+      toolElements.forEach(element => element.remove());
+
+      // Get the updated HTML content with the 'tool' elements removed
+      const cleanedHtmlContent = wrapper.innerHTML;
+
+      // Create a Blob object with the cleaned HTML content
+      const blob = new Blob([cleanedHtmlContent], { type: 'text/html' });
+
+      // Create a download link and simulate a click to download the file
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'exported-content.html';
+
+      // Append the link, trigger the download, and clean up
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     },
     async importMD(res) {
       const file = res.raw || res.file;

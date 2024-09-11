@@ -75,7 +75,6 @@ export default function initializeEditor(elementId = null) {
     clearButton.style.cursor = 'pointer';
     clearButton.style.background = 'none';
     clearButton.style.alignSelf = 'center';
-    clearButton.style.color = '#FF0000';
     clearButton.style.setProperty('margin', '0px', 'important');
     clearButton.appendChild(clearIcon);
     clearButton.addEventListener('click', () => {
