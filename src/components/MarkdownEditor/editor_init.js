@@ -150,11 +150,10 @@ export default function initializeEditor(elementId = null) {
                 } catch (error) {
                     console.error('Error uploading the image:', error);
                 } finally {
-                    // Revert the OK button back to its normal state after upload is complete
                     if (okButton) {
                         okButton.classList.remove('loading');
-                        okButton.innerHTML = 'OK'; // Reset button text
-                        okButton.disabled = false; // Re-enable the button
+                        okButton.innerHTML = 'OK';
+                        okButton.disabled = false;
                     }
                 }
             }

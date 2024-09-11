@@ -80,11 +80,13 @@ export default {
     };
   },
   mounted() {
+    this.loadMathJax();
     this.initializeEditor();
     this.initializeViewer();
-    this.loadMathJax();
-    this.checkPermissions();
-    this.loadMarkedLocal();
+    setTimeout(() => {
+      this.loadMarkedLocal();
+      this.checkPermissions();
+    }, 100);
   },
   methods: {
     saveMarkedLocal(content) {
@@ -105,6 +107,7 @@ export default {
       } catch (e) {
         this.logError("Failed to load content");
       }
+      editor.moveCursorToStart();
     },
     checkPermissions() {
       if (!this.hasPermission()) {
