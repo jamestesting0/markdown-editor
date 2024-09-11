@@ -84,12 +84,12 @@ export default {
     this.initializeEditor();
     this.initializeViewer();
     setTimeout(() => {
-      this.loadMarkedLocal();
+      this.loadMarked();
       this.checkPermissions();
     }, 100);
   },
   methods: {
-    saveMarkedLocal(content) {
+    saveMarked(content) {
       // TODO: implement custom logic here
       try {
         localStorage.setItem('markedContent', content);
@@ -97,7 +97,7 @@ export default {
         this.logError("Failed to save content");
       }
     },
-    loadMarkedLocal() {
+    loadMarked() {
       // TODO: implement custom logic here
       try {
         const savedContent = localStorage.getItem('markedContent');
@@ -136,7 +136,7 @@ export default {
       editor = initializeEditor('editor');
       editor.on("change", () => {
         const content = editor.getMarkdown();
-        this.saveMarkedLocal(content);
+        this.saveMarked(content);
       });
     },
     initializeViewer() {
