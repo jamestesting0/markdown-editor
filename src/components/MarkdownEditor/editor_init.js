@@ -120,8 +120,8 @@ export default function initializeEditor(elementId = null) {
                 const okButton = document.querySelector('.toastui-editor-ok-button');
                 if (okButton) {
                     okButton.classList.add('loading');
-                    okButton.innerHTML = 'Uploading...'; // Set button text to show it's in loading state
-                    okButton.disabled = true; // Disable the button to prevent further interaction
+                    okButton.innerHTML = 'Uploading...';
+                    okButton.disabled = true;
                 }
 
                 try {
