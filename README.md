@@ -23,6 +23,12 @@ Currently, no encryption/decryption is implemented to protect sensitive data. He
 3. Upload of images to for cloud hosting
    1. The editor uses Cloudinary (third-party API) to host local images in the cloud. To add encryption, developing custom image hosting API is probably necessary.
 
+## Compatability
+The editor is based on Vue 3. In order for it to be compatible with Vue 2 the following changes need to be made.
+1. `plugin:vue/vue3-essential` should be changed to `plugin:vue/essential`
+2. `element-plus` package need to be replaced with the older `element-ui`.
+3. `createApp` should be replaced with `new Vue()` in `main.js`.
+
 ## Running the Demo
 ```shell
 npm install
