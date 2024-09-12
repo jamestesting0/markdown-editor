@@ -9,7 +9,9 @@ export const customHTMLRenderer = {
         let tempElement = document.createElement('div');
         tempElement.innerHTML = body.innerHTML;
         tempElement.querySelectorAll('.katex-html').forEach(element => {
-            element.remove();
+            if (element && element.parentNode) {
+                element.parentNode.removeChild(element);
+            }
         });
 
         return [

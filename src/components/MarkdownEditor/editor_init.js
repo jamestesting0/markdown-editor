@@ -44,16 +44,13 @@ export default function initializeEditor(elementId, isMobile) {
     latexButton.addEventListener('click', () => {
         const selectionPos = editor.getSelection()[0];
         let latexText = '$$latex\n' +
-            '\\documentclass{article}\n' +
-            '\\begin{document}\n\n' +
-            '$\n\n$\n\n' +
-            '\\end{document}\n' +
+            '$\n\n$\n' +
             '$$'
         if (selectionPos[1] !== 1) {
             latexText = "\n" + latexText;
         }
         editor.insertText(latexText);
-        selectionPos[0] = selectionPos[0] + 5
+        selectionPos[0] = selectionPos[0] + 2
         selectionPos[1] = selectionPos[1]
         editor.setSelection(selectionPos)
     });
@@ -135,9 +132,8 @@ export default function initializeEditor(elementId, isMobile) {
                     if (uploadResult.secure_url) {
                         const altText = document.getElementById('toastuiAltTextInput');
                         let imgText = "$$img\n" +
-                            "Tip: add any CSS styles as key value pairs below to customize the image\n" +
                             "width:auto\n" +
-                            "height:auto\n" +
+                            "height:auto\n\n" +
                             `![${altText.textContent}](${uploadResult.secure_url})\n` +
                             "$$";
                         if (editor.getSelection()[0][1] !== 1) {

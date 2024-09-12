@@ -81,8 +81,10 @@ export default {
   },
   mounted() {
     this.loadMathJax();
-    this.initializeEditor(this.isMobile());
-    this.initializeViewer();
+    this.$nextTick(() => {
+      this.initializeEditor(this.isMobile());
+      this.initializeViewer();
+    });
     setTimeout(() => {
       this.loadMarked();
       this.checkPermissions();
@@ -266,6 +268,7 @@ export default {
       // Apply CSS to ensure text wrapping and proper styling
       const style = document.createElement('style');
       style.innerHTML = `
+        /* For general text style */
         body, div, p, ul, li, span, a {
           font-size: 12px;
           line-height: 1.6;
@@ -316,8 +319,42 @@ export default {
           font-size: 14px;
           margin-bottom: 2px;
         }
+
+        /* For having page breaks */
         .page-break {
-          page-break-before: always; /* Forces content after this class to be on a new page */
+          page-break-before: always;
+        }
+
+        /* For block quote rendering */
+        blockquote {
+          font-style: italic;
+          color: #555;
+          margin: 1.5em 10px;
+          padding: 0.5em 10px;
+          border-left: 3px solid #ccc;
+          background-color: #f9f9f9;
+        }
+        blockquote p {
+          margin: 0;
+        }
+
+        /* For task list rendering */
+        .task-list-item {
+          list-style-type: none;
+          margin-left: -20px;
+          display: flex;
+          align-items: center;
+        }
+        .task-list-item input[type="checkbox"] {
+          display: none;
+        }
+        .task-list-item.checked::before {
+          content: '✅'; /* Checked box symbol */
+          margin-right: 10px;
+        }
+        .task-list-item::before {
+          content: '⬜'; /* Unchecked box symbol */
+          margin-right: 10px;
         }
       `;
       tempElement.appendChild(style);
@@ -379,7 +416,7 @@ export default {
       } catch (error) {
         this.logError("Error converting images to base64:", error);
       }
-    }
+    },
   }
 };
 </script>
