@@ -81,7 +81,7 @@ export default {
   },
   mounted() {
     this.loadMathJax();
-    this.initializeEditor();
+    this.initializeEditor(this.isMobile());
     this.initializeViewer();
     setTimeout(() => {
       this.loadMarked();
@@ -89,6 +89,9 @@ export default {
     }, 100);
   },
   methods: {
+    isMobile() {
+      return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    },
     saveMarked(content) {
       // TODO: implement custom logic here
       try {
@@ -132,8 +135,8 @@ export default {
         }
       }
     },
-    initializeEditor() {
-      editor = initializeEditor('editor');
+    initializeEditor(isMobile) {
+      editor = initializeEditor('editor', isMobile);
       editor.on("change", () => {
         const content = editor.getMarkdown();
         this.saveMarked(content);

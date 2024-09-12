@@ -15,7 +15,7 @@ import Prism from 'prismjs';
 import 'prismjs/components/prism-clojure.js';
 import { customHTMLRenderer } from './html_renderers';
 
-export default function initializeEditor(elementId = null) {
+export default function initializeEditor(elementId, isMobile) {
     // Generate and create the editor element
     const generatedId = elementId || 'markdown-editor-' + +new Date() + ((Math.random() * 1000).toFixed(0) + '');
 
@@ -90,7 +90,7 @@ export default function initializeEditor(elementId = null) {
     // Create the custom editor
     const editor = new Editor({
         el: editorElement,
-        previewStyle: 'vertical',
+        previewStyle: isMobile ? 'tab' : 'vertical',
         height: '500px',
         initialEditType: "markdown",
         placeholder: "Please enter your text here",

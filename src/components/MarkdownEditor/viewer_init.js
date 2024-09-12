@@ -11,7 +11,7 @@ import Prism from 'prismjs';
 import 'prismjs/components/prism-clojure.js';
 import { customHTMLRenderer } from './html_renderers';
 
-export default function initializeViewer(elementId = null) {
+export default function initializeViewer(elementId) {
     const generatedId = elementId || 'markdown-viewer-' + +new Date() + ((Math.random() * 1000).toFixed(0) + '');
 
     let viewerElement = document.querySelector(`#${generatedId}`);

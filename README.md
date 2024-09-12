@@ -11,6 +11,7 @@
 8. HTML source download.
 9. Saving/loading of Markdown content.
 10. Free third-party image cloud hosting.
+11. Appropriate editor preview style to better support both PC and mobile usage.
 
 ## Extending Functionalities
 1. Customize `hasPermission()` method in `src/views/markdown.vue`, which determines whether the user will be in editor or viewer mode.
