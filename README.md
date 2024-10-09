@@ -1,4 +1,4 @@
-# CHUK Custom Markdown Editor
+# CUHK Custom Markdown Editor
 
 ## Functionalities
 1. Support all basic Markdown syntax. (Default TUI Editor)

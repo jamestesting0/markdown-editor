@@ -88,7 +88,7 @@ export default {
     setTimeout(() => {
       this.loadMarked();
       this.checkPermissions();
-    }, 100);
+    }, 200);
   },
   methods: {
     isMobile() {
